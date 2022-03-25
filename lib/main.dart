@@ -1,13 +1,21 @@
+import 'package:flutter/services.dart';
+
 import './widgets/chart.dart';
 import 'package:expense_app/widgets/new_transaction.dart';
 import 'package:expense_app/widgets/transaction_list.dart';
-
+import 'package:flutter/services.dart';
 import './widgets/transaction_list.dart';
 import './models/transaction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  //To enable different mode in which the app would be rendered
+  // WidgetsFlutterBinding.ensureInitialized();
+  //SystemChrome.setPreferredOrientations(
+  //  [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -35,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
         id: 't2', title: 'Clothes', amount: 30.31, date: DateTime.now()),
   ];
 
+  bool _showChart = false;
   List<Transaction> get _recentTransaction {
     return _userTransaction.where((tx) {
       return tx.date.isAfter(
@@ -45,12 +54,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String title, double amount) {
+  void _addNewTransaction(String title, double amount, DateTime chosenDate) {
     final newTx = Transaction(
       id: DateTime.now.toString(),
       title: title,
       amount: amount,
-      date: DateTime.now(),
+      date: chosenDate,
     );
 
     setState(() {
@@ -71,21 +80,46 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = AppBar(
+      title: Text('Flutter App'),
+      backgroundColor: Colors.purple,
+      actions: <Widget>[
+        IconButton(
+            onPressed: () => startAddNewTransaction(context),
+            icon: Icon(Icons.add)),
+      ],
+    );
+    final txList = Container(
+        height: (MediaQuery.of(context).size.height -
+                appBar.preferredSize.height -
+                MediaQuery.of(context).padding.top) *
+            0.7,
+        child: TransactionList(_userTransaction));
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Flutter App'),
-        backgroundColor: Colors.purple,
-        actions: <Widget>[
-          IconButton(
-              onPressed: () => startAddNewTransaction(context),
-              icon: Icon(Icons.add)),
-        ],
-      ),
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
+              if (isLandscape)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('Show Chart'),
+                    //Switch button
+                    Switch(
+                      value: _showChart,
+                      onChanged: (val) {
+                        setState(() {
+                          _showChart = val;
+                        });
+                      },
+                    )
+                  ],
+                ),
               Card(
                 child: Container(
                   width: double.infinity,
@@ -94,8 +128,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 elevation: 5,
               ),
-              Chart(_recentTransaction),
-              TransactionList(_userTransaction),
+              if (!isLandscape)
+                Container(
+                    height: (MediaQuery.of(context).size.height -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top) *
+                        0.3,
+                    child: Chart(_recentTransaction)),
+                if(!isLandscape)txList,
+               if(isLandscape) _showChart
+                    ?
+                    : txList,
             ]),
       ),
       floatingActionButton: FloatingActionButton(

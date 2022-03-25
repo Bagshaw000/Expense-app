@@ -31,16 +31,17 @@ class TransactionList extends StatelessWidget {
               ),
             ),
             Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    tx.title,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  Text(DateFormat('yyyy-MM-dd').format(tx.date),
-                      style: TextStyle(color: Colors.grey))
-                ])
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  tx.title,
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                Text(DateFormat('yyyy-MM-dd').format(tx.date),
+                    style: TextStyle(color: Colors.grey)),
+              ],
+            ),
           ],
         ),
       );
